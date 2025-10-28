@@ -1,0 +1,197 @@
+Sub CopySheetNamesAndValuesToAnotherFile()
+    Dim wbSource As Workbook
+    Dim wbTarget As Workbook
+    Dim wsSource As Worksheet
+    Dim wsTarget As Worksheet
+    Dim sourceFile As String, targetFile As String
+    Dim lastRow As Long, i As Long
+    Dim sheetName As String
+    Dim sumR As Double, sumY As Double, sumAD As Double, sumAI As Double, valueAN53 As Double
+    Dim valueO71 As Double, valueR79 As Double, valueY79 As Double, valueAD79 As Double, valueAI79 As Double
+    Dim valueR80 As Double, valueY80 As Double, valueAD80 As Double, valueAI80 As Double
+    Dim valueR88 As Double, valueY88 As Double, valueAD88 As Double, valueAI88 As Double
+    Dim valueAT79 As Double, valueAT80 As Double, valueAT88 As Double
+
+    ' ファイル選択ダイアログを表示してファイル1（本体）を選択
+    sourceFile = Application.GetOpenFilename("Excelファイル (*.xlsm), *.xlsm", , "ファイル1（本体）を選択してください")
+    If sourceFile = "False" Then Exit Sub ' キャンセル時は終了
+    
+    ' ファイル選択ダイアログを表示してファイル2（転記先）を選択
+    targetFile = Application.GetOpenFilename("Excelファイル (*.xlsm), *.xlsm", , "ファイル2（転記先）を選択してください")
+    If targetFile = "False" Then Exit Sub ' キャンセル時は終了
+    
+    ' ファイルを開く
+    Set wbSource = Workbooks.Open(sourceFile)
+    Set wbTarget = Workbooks.Open(targetFile)
+    
+    ' シートを設定
+    Set wsSource = wbSource.Sheets("計算対象室テーブル")
+    Set wsTarget = wbTarget.Sheets("熱負荷集計")
+    
+    ' AG列の最終行を取得（空白セルが出るまで）
+    lastRow = wsSource.Cells(wsSource.Rows.Count, "B").End(xlUp).Row
+    
+    ' B7から順にシート名を転記（AG列の5行目から取得）
+    For i = 5 To lastRow
+        sheetName = Trim(wsSource.Cells(i, "B").value) ' AG列のシート名を取得
+        If sheetName <> "" Then
+            wsTarget.Cells(7 + (i - 5), "B").value = sheetName ' B7セルから転記
+        End If
+    Next i
+    
+    ' B列のシート名を基に各セルの値を取得し、J～AG列に記載
+    i = 7 ' B7セルから開始
+    Application.ScreenUpdating = False
+    Application.Calculation = xlCalculationAutomatic
+
+    Do While wsTarget.Cells(i, "B").value <> ""
+        sheetName = Trim(wsTarget.Cells(i, "B").value)
+        
+        ' 該当シートが存在するか確認
+        If SheetExists(wbSource, sheetName) Then
+            With wbSource.Sheets(sheetName)
+                ' 小数第2位を四捨五入して小数第1位までにする
+                sumR = Round(.Range("R53").value + .Range("R67").value + .Range("R69").value + .Range("R71").value + .Range("R72").value + .Range("R73").value + .Range("R74").value, 1)
+                sumY = Round(.Range("Y53").value + .Range("Y67").value + .Range("Y69").value + .Range("Y71").value + .Range("Y72").value + .Range("Y73").value + .Range("Y74").value, 1)
+                sumAD = Round(.Range("AD53").value + .Range("AD67").value + .Range("AD69").value + .Range("AD71").value + .Range("AD72").value + .Range("AD73").value + .Range("AD74").value, 1)
+                sumAI = Round(.Range("AI53").value + .Range("AI67").value + .Range("AI69").value + .Range("AI71").value + .Range("AI72").value + .Range("AI73").value + .Range("AI74").value, 1)
+                valueAN53 = Round(.Range("AN53").value, 1) '冬季構造体負荷
+
+                valueO71 = Round(.Range("O71").value, 1) '人員負荷潜熱
+                valueR79 = Round(.Range("R79").value, 1)   '外気負荷顕熱_9時
+                valueY79 = Round(.Range("Y79").value, 1)   '外気負荷顕熱_12時
+                valueAD79 = Round(.Range("AD79").value, 1) '外気負荷顕熱_14時
+                valueAI79 = Round(.Range("AI79").value, 1) '外気負荷顕熱_16時
+                valueR80 = Round(.Range("R80").value, 1) '外気負荷潜熱_9時
+                valueY80 = Round(.Range("Y80").value, 1) '外気負荷潜熱_12時
+                valueAD80 = Round(.Range("AD80").value, 1) '外気負荷潜熱_14時
+                valueAI80 = Round(.Range("AI80").value, 1) '外気負荷潜熱_16時
+                valueR88 = Round(.Range("R88").value, 1) '全熱_9時
+                valueY88 = Round(.Range("Y88").value, 1) '全熱_12時
+                valueAD88 = Round(.Range("AD88").value, 1) '全熱_14時
+                valueAI88 = Round(.Range("AI88").value, 1) '全熱_16時
+                valueAT79 = Round(.Range("AT79").value, 1) '冬季_外気負荷潜熱
+                valueAT80 = Round(.Range("AT80").value, 1) '冬季_外気負荷顕熱
+                valueAT88 = Round(.Range("AT88").value, 1) '冬季_全熱
+            End With
+
+            ' 転記
+            wsTarget.Cells(i, 11).value = sumR  ' K列
+            wsTarget.Cells(i, 12).value = sumY  ' L列
+            wsTarget.Cells(i, 13).value = sumAD ' M列
+            wsTarget.Cells(i, 14).value = sumAI ' N列
+            wsTarget.Cells(i, 15).value = valueO71  ' O列
+            wsTarget.Cells(i, 16).value = valueO71  ' P列
+            wsTarget.Cells(i, 17).value = valueO71 ' Q列
+            wsTarget.Cells(i, 18).value = valueO71 ' R列
+            wsTarget.Cells(i, 19).value = valueR79 ' S列
+            wsTarget.Cells(i, 20).value = valueY79  ' T列
+            wsTarget.Cells(i, 21).value = valueAD79 ' U列
+            wsTarget.Cells(i, 22).value = valueAI80 ' V列
+            wsTarget.Cells(i, 23).value = valueR80 ' W列
+            wsTarget.Cells(i, 24).value = valueY80  ' X列
+            wsTarget.Cells(i, 25).value = valueAD80 ' Y列
+            wsTarget.Cells(i, 26).value = valueAI80 ' Z列
+            wsTarget.Cells(i, 27).value = valueR88 ' AA列
+            wsTarget.Cells(i, 28).value = valueY88  ' AB列
+            wsTarget.Cells(i, 29).value = valueAD88 ' AC列
+            wsTarget.Cells(i, 30).value = valueAI88 ' AD列
+            wsTarget.Cells(i, 31).value = valueAN53 ' AE列
+            wsTarget.Cells(i, 32).value = valueAT79 ' AF列
+            wsTarget.Cells(i, 33).value = valueAT80 ' AG列
+            wsTarget.Cells(i, 34).value = valueAT88 ' AH列
+            
+        End If
+        
+        i = i + 1
+    Loop
+
+    Application.ScreenUpdating = True
+    
+    ' 変更を保存
+    wbTarget.Save
+    
+    ' ファイルを閉じる（元ファイルは閉じない）
+    wbTarget.Close False
+    
+    ' メッセージ表示
+    MsgBox "シート名と指定セルのコピーが完了しました。", vbInformation
+End Sub
+
+' 指定されたブックにシートが存在するか確認する関数
+Function SheetExists(wb As Workbook, sheetName As String) As Boolean
+    Dim ws As Worksheet
+    On Error Resume Next
+    Set ws = wb.Sheets(sheetName)
+    SheetExists = Not ws Is Nothing
+    On Error GoTo 0
+End Function
+' マトリックス表をリスト形式に変換するVBAマクロ（時間データをJ6から正しく取得し、時間が存在しない場合は「-」を設定し、セルの自動調整を追加）
+Sub ConvertMatrixToList()
+    Dim wbSource As Workbook
+    Dim wsSource As Worksheet
+    Dim wsTarget As Worksheet
+    Dim sourceFile As String
+    Dim lastRow As Long, lastCol As Long
+    Dim i As Long, j As Long, outputRow As Long
+    Dim loadType As String, timeValue As String
+    
+    ' ファイル選択ダイアログを表示して変換するExcelファイルを選択
+    sourceFile = Application.GetOpenFilename("Excelファイル (*.xlsx), *.xlsx", , "マトリックス表のあるファイルを選択してください")
+    If sourceFile = "False" Then Exit Sub ' キャンセル時は終了
+    
+    ' 選択したファイルを開く
+    Set wbSource = Workbooks.Open(sourceFile)
+    Set wsSource = wbSource.Sheets("熱負荷集計") ' 元のマトリックス表
+    
+    ' 新しいシートを追加してリスト形式を保存
+    Set wsTarget = wbSource.Sheets.Add(After:=wbSource.Sheets(wbSource.Sheets.Count))
+    wsTarget.Name = "リスト形式"
+    
+    ' ヘッダーを設定
+    wsTarget.Cells(1, 1).value = "名称"
+    wsTarget.Cells(1, 2).value = "負荷種別"
+    wsTarget.Cells(1, 3).value = "時間帯"
+    wsTarget.Cells(1, 4).value = "負荷値"
+    
+    ' データ範囲の取得
+    lastRow = wsSource.Cells(Rows.Count, "D").End(xlUp).Row ' D列の最終行（部屋名称）
+    lastCol = wsSource.Cells(4, Columns.Count).End(xlToLeft).Column ' J4 以降の負荷種別の最終列
+    
+    outputRow = 2 ' 出力用の行を初期化
+    
+    ' データ変換ループ
+    For i = 7 To lastRow ' D7 からデータが開始（部屋名称）
+        For j = 10 To lastCol ' J列（室内SH）以降のデータを取得
+            If wsSource.Cells(4, j).value <> "" Then
+                loadType = wsSource.Cells(4, j).value ' 負荷種別（J4行）
+            End If
+            If wsSource.Cells(6, j).value <> "" Then
+                timeValue = wsSource.Cells(6, j).value ' 時間（J6行）
+            Else
+                timeValue = "-" ' 時間がない場合は「-」を設定
+            End If
+            
+            If wsSource.Cells(i, j).value <> "" Then ' 空白でない場合のみ処理
+                wsTarget.Cells(outputRow, 1).value = wsSource.Cells(i, 4).value ' 名称（D列）
+                wsTarget.Cells(outputRow, 2).value = loadType ' 負荷種別
+                wsTarget.Cells(outputRow, 3).value = timeValue ' 時間
+                wsTarget.Cells(outputRow, 4).value = wsSource.Cells(i, j).value ' 負荷値
+                outputRow = outputRow + 1 ' 次の行に移動
+            End If
+        Next j
+    Next i
+    
+    ' セルの自動調整
+    wsTarget.Columns("A:D").AutoFit
+    
+    ' メッセージ表示
+    MsgBox "マトリックス表をリスト形式に変換し、シートを追加しました！", vbInformation
+    
+    ' ファイルを保存
+    wbSource.Save
+    
+    ' ファイルを閉じる
+    wbSource.Close False
+End Sub
+
