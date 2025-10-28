@@ -1,4 +1,4 @@
-Sub CopySheetNamesAndValuesToAnotherFile()
+Sub 単一シートの熱負荷データの転記()
     Dim wbSource As Workbook
     Dim wbTarget As Workbook
     Dim wsSource As Worksheet
