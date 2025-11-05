@@ -51,17 +51,17 @@ Sub 単一シートの熱負荷データの転記()
         If SheetExists(wbSource, sheetName) Then
             With wbSource.Sheets(sheetName)
                 ' 小数第2位を四捨五入して小数第1位までにする
-                sumR = Round(.Range("R53").value + .Range("R67").value + .Range("R69").value + .Range("R71").value + .Range("R72").value + .Range("R73").value + .Range("R74").value, 1)
-                sumY = Round(.Range("Y53").value + .Range("Y67").value + .Range("Y69").value + .Range("Y71").value + .Range("Y72").value + .Range("Y73").value + .Range("Y74").value, 1)
-                sumAD = Round(.Range("AD53").value + .Range("AD67").value + .Range("AD69").value + .Range("AD71").value + .Range("AD72").value + .Range("AD73").value + .Range("AD74").value, 1)
-                sumAI = Round(.Range("AI53").value + .Range("AI67").value + .Range("AI69").value + .Range("AI71").value + .Range("AI72").value + .Range("AI73").value + .Range("AI74").value, 1)
+                sumR = (Round(.Range("R53").value + .Range("R67").value + .Range("R69").value + .Range("R71").value + .Range("R72").value + .Range("R73").value + .Range("R74").value, 1)) * .Range("R83")
+                sumY = (Round(.Range("Y53").value + .Range("Y67").value + .Range("Y69").value + .Range("Y71").value + .Range("Y72").value + .Range("Y73").value + .Range("Y74").value, 1)) * .Range("Y83")
+                sumAD = (Round(.Range("AD53").value + .Range("AD67").value + .Range("AD69").value + .Range("AD71").value + .Range("AD72").value + .Range("AD73").value + .Range("AD74").value, 1)) * .Range("AD83")
+                sumAI = (Round(.Range("AI53").value + .Range("AI67").value + .Range("AI69").value + .Range("AI71").value + .Range("AI72").value + .Range("AI73").value + .Range("AI74").value, 1)) * .Range("AI83")
                 valueAN53 = Round(.Range("AN53").value, 1) '冬季構造体負荷
 
                 valueO71 = Round(.Range("O71").value, 1) '人員負荷潜熱
-                valueR79 = Round(.Range("R79").value, 1)   '外気負荷顕熱_9時
-                valueY79 = Round(.Range("Y79").value, 1)   '外気負荷顕熱_12時
-                valueAD79 = Round(.Range("AD79").value, 1) '外気負荷顕熱_14時
-                valueAI79 = Round(.Range("AI79").value, 1) '外気負荷顕熱_16時
+                valueR79 = Round(.Range("R79").value, 1) * .Range("R83") '外気負荷顕熱_9時
+                valueY79 = Round(.Range("Y79").value, 1) * .Range("Y83") '外気負荷顕熱_12時
+                valueAD79 = Round(.Range("AD79").value, 1) * .Range("AD83") '外気負荷顕熱_14時
+                valueAI79 = Round(.Range("AI79").value, 1) * .Range("AI83") '外気負荷顕熱_16時
                 valueR80 = Round(.Range("R80").value, 1) '外気負荷潜熱_9時
                 valueY80 = Round(.Range("Y80").value, 1) '外気負荷潜熱_12時
                 valueAD80 = Round(.Range("AD80").value, 1) '外気負荷潜熱_14時
@@ -76,7 +76,7 @@ Sub 単一シートの熱負荷データの転記()
             End With
 
             ' 転記
-            wsTarget.Cells(i, 11).value = sumR  ' K列
+            wsTarget.Cells(i, 11).value = sumR   ' K列
             wsTarget.Cells(i, 12).value = sumY  ' L列
             wsTarget.Cells(i, 13).value = sumAD ' M列
             wsTarget.Cells(i, 14).value = sumAI ' N列
